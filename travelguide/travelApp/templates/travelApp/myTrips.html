@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+
+{% block title %}My Trips{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+  <h2 class="mb-4">Your Booked Trips</h2>
+  {% if trips %}
+    <ul class="list-group">
+      {% for trip in trips %}
+        <li class="list-group-item">
+          <strong>{{ trip.start_destination }}</strong> → <strong>{{ trip.end_destination }}</strong><br>
+          {{ trip.start_date }} to {{ trip.end_date }}
+        </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p>You haven’t booked any trips yet.</p>
+  {% endif %}
+</div>
+{% endblock %}

@@ -2,7 +2,6 @@ from django.db import models
 from django.contrib.auth.models import User
 
 class TravelPlan(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='travel_plans')
     name = models.CharField(max_length=100)
     start_destination = models.CharField(max_length=100)
     end_destination = models.CharField(max_length=100)
@@ -22,5 +21,16 @@ class Account(models.Model):
 
     def __str__(self):
         return f'User: {self.name}'
+    
+class MyTrip(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='my_trips')
+    start_destination = models.CharField(max_length=100)
+    end_destination = models.CharField(max_length=100)
+    start_date = models.DateField()
+    end_date = models.DateField()
+    booked_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.user.username}'s trip: {self.start_destination} → {self.end_destination}"
 
 
