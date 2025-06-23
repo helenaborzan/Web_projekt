@@ -14,4 +14,13 @@ class TravelPlan(models.Model):
 
     def __str__(self):
         return f"{self.name} ({self.start_destination} → {self.end_destination})"
+    
+class Account(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    name = models.CharField(max_length=50)
+    mail = models.CharField(max_length=50)
+
+    def __str__(self):
+        return f'User: {self.name}'
+
 
