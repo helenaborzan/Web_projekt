@@ -4,20 +4,27 @@
 
 {% block extra_head %}
 <style>
-  .form-section {
-    max-width: 720px;
-    margin: 3rem auto;
-    background-color: #ffffff;
-    padding: 2rem 2.5rem;
-    border-radius: 16px;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+  .page-layout {
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 2rem;
+    margin-top: 3rem;
   }
 
-  .form-section h2 {
+  .form-column {
+    flex: 0 0 40%;
+    background-color: #ffffff;
+    padding: 2rem;
+    border-radius: 16px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+    height: fit-content;
+  }
+
+  .form-column h2 {
     font-weight: 700;
-    margin-bottom: 2rem;
-    text-align: center;
     color: #0d6efd;
+    text-align: center;
+    margin-bottom: 1.5rem;
   }
 
   .btn-submit {
@@ -27,39 +34,61 @@
     border-radius: 8px;
   }
 
+  .results-column {
+    flex: 0 0 60%;
+  }
+
+  .trip-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.5rem;
+  }
+
   .trip-card {
     background-color: #f8f9fa;
     border-radius: 12px;
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
-    margin-bottom: 1.5rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
     overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
     transition: transform 0.2s ease;
   }
 
   .trip-card:hover {
-    transform: scale(1.01);
+    transform: scale(1.015);
   }
 
   .trip-image {
-    object-fit: cover;
     width: 100%;
-    height: 100%;
-    border-radius: 12px 0 0 12px;
+    height: 160px;
+    object-fit: cover;
   }
 
   .trip-info {
-    padding: 1rem 1.5rem;
+    padding: 1rem 1.25rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    flex-grow: 1;
   }
 
   .trip-title {
-    color: #212529;
-    font-size: 1.4rem;
+    font-size: 1.2rem;
     font-weight: 600;
+    color: #0d6efd;
+    margin-bottom: 0.5rem;
   }
 
   .trip-meta {
-    font-size: 0.95rem;
+    font-size: 0.9rem;
     color: #495057;
+    margin-bottom: 0.3rem;
+  }
+
+  .book-button {
+    margin-top: 0.8rem;
+    width: 100%;
   }
 
   .no-trips {
@@ -68,34 +97,50 @@
     font-weight: bold;
     margin-top: 2rem;
   }
+
+  @media (max-width: 991px) {
+    .page-layout {
+      flex-direction: column;
+    }
+
+    .form-column,
+    .results-column {
+      flex: 100%;
+    }
+
+    .trip-grid {
+      grid-template-columns: 1fr;
+    }
+  }
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="container">
-  <div class="form-section">
+<div class="container page-layout">
+
+  <div class="form-column">
     <h2>Plan Your Trip</h2>
     <form method="POST">
       {% csrf_token %}
       {{ form.non_field_errors }}
       <div class="mb-3">
-        <label for="{{ form.start_destination.id_for_label }}" class="form-label">Start Destination</label>
+        <label class="form-label">Start Destination</label>
         {{ form.start_destination }}
       </div>
       <div class="mb-3">
-        <label for="{{ form.end_destination.id_for_label }}" class="form-label">End Destination</label>
+        <label class="form-label">End Destination</label>
         {{ form.end_destination }}
       </div>
       <div class="mb-3">
-        <label for="{{ form.start_date.id_for_label }}" class="form-label">Start Date</label>
+        <label class="form-label">Start Date</label>
         {{ form.start_date }}
       </div>
       <div class="mb-3">
-        <label for="{{ form.end_date.id_for_label }}" class="form-label">End Date</label>
+        <label class="form-label">End Date</label>
         {{ form.end_date }}
       </div>
       <div class="mb-3">
-        <label for="{{ form.number_of_people.id_for_label }}" class="form-label">Number of People</label>
+        <label class="form-label">Number of People</label>
         {{ form.number_of_people }}
       </div>
       <button type="submit" name="search" class="btn btn-primary btn-submit">
@@ -104,41 +149,43 @@
     </form>
   </div>
 
-  {% if no_trips %}
-    <div class="no-trips">No trips available for selected categories</div>
-  {% endif %}
+  <div class="results-column">
+    {% if no_trips %}
+      <div class="no-trips">No trips available for selected categories</div>
+    {% endif %}
 
-  {% if available_trips %}
-    <div class="mt-5">
-      <h4 class="text-center mb-4">Available Trips</h4>
-      <div class="row row-cols-1 row-cols-md-2 g-4">
+    {% if available_trips %}
+      <h4 class="text-center mb-4">
+        {% if form_submitted %}Matching Trips{% else %}Available Trips{% endif %}
+      </h4>
+      <div class="trip-grid">
         {% for trip in available_trips %}
-          <div class="col">
-            <div class="trip-card d-flex flex-column flex-md-row">
-              {% if trip.picture_url %}
-                <div class="col-md-5">
-                  <img src="{{ trip.picture_url }}" alt="{{ trip.name }}" class="trip-image w-100 h-100">
-                </div>
-              {% endif %}
-              <div class="trip-info col">
-                <h5 class="trip-title">{{ trip.name }}</h5>
+          <div class="trip-card">
+            {% if trip.picture_url %}
+              <img src="{{ trip.picture_url }}" alt="{{ trip.name }}" class="trip-image">
+            {% endif %}
+            <div class="trip-info">
+              <div>
+                <div class="trip-title">{{ trip.name }}</div>
                 <p class="trip-meta">{{ trip.description }}</p>
-                <p class="trip-meta mb-1"><i class="bi bi-geo-alt me-1"></i>{{ trip.start_destination }} → {{ trip.end_destination }}</p>
-                <p class="trip-meta mb-1"><i class="bi bi-calendar-event me-1"></i>{{ trip.start_date }} to {{ trip.end_date }}</p>
-                <p class="trip-meta mb-3"><i class="bi bi-people me-1"></i>{{ trip.number_of_people }} people · <strong>${{ trip.price }}</strong></p>
-                <form method="POST">
-                  {% csrf_token %}
-                  <input type="hidden" name="book_trip_id" value="{{ trip.id }}">
-                  <button type="submit" class="btn btn-success w-100">
-                    <i class="bi bi-check2-circle me-1"></i>Book Now
-                  </button>
-                </form>
+                <p class="trip-meta"><i class="bi bi-geo-alt me-1"></i>{{ trip.start_destination }} → {{ trip.end_destination }}</p>
+                <p class="trip-meta"><i class="bi bi-calendar me-1"></i>{{ trip.start_date }} to {{ trip.end_date }}</p>
+                <p class="trip-meta"><i class="bi bi-people me-1"></i>{{ trip.number_of_people }} people · ${{ trip.price }}</p>
               </div>
+              <form method="POST">
+                {% csrf_token %}
+                <input type="hidden" name="book_trip_id" value="{{ trip.id }}">
+                <input type="hidden" name="number_of_people" value="{{ form.number_of_people.value|default:1 }}">
+                <button type="submit" class="btn btn-success book-button">
+                  <i class="bi bi-check2-circle me-1"></i>Book Now
+                </button>
+              </form>
             </div>
           </div>
         {% endfor %}
       </div>
-    </div>
-  {% endif %}
+    {% endif %}
+  </div>
 </div>
 {% endblock %}
+

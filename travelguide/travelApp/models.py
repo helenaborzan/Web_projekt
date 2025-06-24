@@ -26,6 +26,7 @@ class Account(models.Model):
     
 class MyTrip(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='my_trips')
+    travel_plan = models.ForeignKey('TravelPlan', on_delete=models.CASCADE, null=True, blank=True)
     start_destination = models.CharField(max_length=100)
     end_destination = models.CharField(max_length=100)
     start_date = models.DateField()

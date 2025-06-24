@@ -6,21 +6,27 @@
 <div class="container mt-5">
   <h2 class="mb-4">Your Booked Trips</h2>
   {% if trips %}
-    <ul class="list-group">
-      {% for trip in trips %}
-        <div class="card mb-4">
-            {% if trip.picture_url %}
-            <img src="{{ trip.picture_url }}" class="card-img-top" alt="{{ trip.name }}">
-            {% endif %}
-            <div class="card-body">
-            <h5 class="card-title">{{ trip.name }}</h5>
-            <p class="card-text">{{ trip.description }}</p>
-            <p class="card-text">{{ trip.start_destination }} → {{ trip.end_destination }}</p>
-            <p class="card-text">{{ trip.start_date }} to {{ trip.end_date }}</p>
-            </div>
+    {% for trip in trips %}
+      <div class="card mb-4">
+        {% if trip.travel_plan.picture_url %}
+          <img src="{{ trip.travel_plan.picture_url }}" class="card-img-top" alt="{{ trip.travel_plan.name }}">
+        {% endif %}
+        <div class="card-body">
+          <h5 class="card-title">{{ trip.travel_plan.name }}</h5>
+          <p class="card-text">{{ trip.travel_plan.description }}</p>
+          <p class="card-text">{{ trip.start_destination }} → {{ trip.end_destination }}</p>
+          <p class="card-text">{{ trip.start_date }} to {{ trip.end_date }}</p>
+          <p class="card-text">People: {{ trip.number_of_people }}</p>
+          <form method="POST" class="mt-3">
+            {% csrf_token %}
+            <input type="hidden" name="delete_trip_id" value="{{ trip.id }}">
+            <button type="submit" class="btn btn-danger">
+              Cancel reservation
+            </button>
+          </form>
         </div>
-      {% endfor %}
-    </ul>
+      </div>
+    {% endfor %}
   {% else %}
     <p>You haven’t booked any trips yet.</p>
   {% endif %}

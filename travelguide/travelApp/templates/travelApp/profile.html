@@ -1,0 +1,120 @@
+{% extends "base.html" %}
+
+{% block title %}Your Profile{% endblock %}
+
+{% block extra_head %}
+<style>
+  .profile-header {
+    background-color: #f8f9fa;
+    padding: 2rem;
+    border-radius: 12px;
+    margin-top: 2rem;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+  }
+
+  .profile-header h2 {
+    color: #0d6efd;
+    font-weight: 600;
+  }
+
+  .profile-details {
+    margin-top: 1.5rem;
+    font-size: 1.05rem;
+  }
+
+  .stats-box {
+    background-color: #ffffff;
+    padding: 1rem 1.5rem;
+    border-radius: 10px;
+    text-align: center;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+  }
+
+  .stats-box h4 {
+    margin: 0;
+    color: #0d6efd;
+  }
+
+  .trip-card {
+    border: 1px solid #dee2e6;
+    border-radius: 12px;
+    overflow: hidden;
+    transition: transform 0.2s ease;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.04);
+  }
+
+  .trip-card:hover {
+    transform: scale(1.01);
+  }
+
+  .trip-img {
+    height: 180px;
+    object-fit: cover;
+    width: 100%;
+  }
+
+  .trip-body {
+    padding: 1rem;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+  <div class="profile-header">
+    <h2>Welcome, {{ user.username }} 👋</h2>
+    <div class="profile-details">
+      <p><strong>Email:</strong> {{ user.email }}</p>
+      {% if account %}
+        <p><strong>Full Name:</strong> {{ account.name }}</p>
+        <p><strong>Registered Email:</strong> {{ account.mail }}</p>
+      {% endif %}
+    </div>
+  </div>
+
+  <div class="row text-center my-5">
+    <div class="col-md-4">
+      <div class="stats-box">
+        <h4>{{ total_trips }}</h4>
+        <p>Total Trips</p>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="stats-box">
+        <h4>${{ total_spent }}</h4>
+        <p>Total Spent</p>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="stats-box">
+        <h4>{{ upcoming_trips }}</h4>
+        <p>Upcoming Trips</p>
+      </div>
+    </div>
+  </div>
+
+  <h4 class="mb-4">Recent Trips</h4>
+  {% if recent_trips %}
+    <div class="row row-cols-1 row-cols-md-2 g-4">
+      {% for trip in recent_trips %}
+        <div class="col">
+          <div class="trip-card">
+            {% if trip.travel_plan.picture_url %}
+              <img src="{{ trip.travel_plan.picture_url }}" class="trip-img" alt="{{ trip.travel_plan.name }}">
+            {% endif %}
+            <div class="trip-body">
+              <h5>{{ trip.travel_plan.name }}</h5>
+              <p>{{ trip.travel_plan.description|truncatechars:100 }}</p>
+              <p><i class="bi bi-geo-alt"></i> {{ trip.start_destination }} → {{ trip.end_destination }}</p>
+              <p><i class="bi bi-calendar-event"></i> {{ trip.start_date }} to {{ trip.end_date }}</p>
+            </div>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <p>You haven't booked any trips yet.</p>
+  {% endif %}
+</div>
+{% endblock %}
