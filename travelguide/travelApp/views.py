@@ -44,9 +44,14 @@ def signup(request):
 @login_required
 def plan_trip(request):
     form = TripForm()
-    available_trips = TravelPlan.objects.filter(number_of_people__gt=0)
+    today = now().date()
     form_submitted = False
     no_trips = False
+
+    available_trips = TravelPlan.objects.filter(
+        number_of_people__gt=0,
+        start_date__gte=today
+    )
 
     if request.method == 'POST':
         if 'search' in request.POST:
@@ -59,7 +64,7 @@ def plan_trip(request):
                 available_trips = TravelPlan.objects.filter(
                     start_destination__iexact=cd['start_destination'],
                     end_destination__iexact=cd['end_destination'],
-                    start_date__gte=cd['start_date'],
+                    start_date__gte=max(cd['start_date'], today),
                     end_date__lte=cd['end_date'],
                     number_of_people__gte=cd['number_of_people']
                 )
@@ -81,7 +86,7 @@ def plan_trip(request):
                     end_destination=plan.end_destination,
                     start_date=plan.start_date,
                     end_date=plan.end_date,
-                    number_of_people=int(request.POST.get('number_of_people', 1))
+                    number_of_people=num_people
                 )
 
                 plan.number_of_people -= num_people
@@ -100,6 +105,7 @@ def plan_trip(request):
         'form_submitted': form_submitted,
         'no_trips': no_trips
     })
+
 
 @login_required
 def my_trips(request):
