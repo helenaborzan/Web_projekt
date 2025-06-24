@@ -8,10 +8,17 @@
   {% if trips %}
     <ul class="list-group">
       {% for trip in trips %}
-        <li class="list-group-item">
-          <strong>{{ trip.start_destination }}</strong> → <strong>{{ trip.end_destination }}</strong><br>
-          {{ trip.start_date }} to {{ trip.end_date }}
-        </li>
+        <div class="card mb-4">
+            {% if trip.picture_url %}
+            <img src="{{ trip.picture_url }}" class="card-img-top" alt="{{ trip.name }}">
+            {% endif %}
+            <div class="card-body">
+            <h5 class="card-title">{{ trip.name }}</h5>
+            <p class="card-text">{{ trip.description }}</p>
+            <p class="card-text">{{ trip.start_destination }} → {{ trip.end_destination }}</p>
+            <p class="card-text">{{ trip.start_date }} to {{ trip.end_date }}</p>
+            </div>
+        </div>
       {% endfor %}
     </ul>
   {% else %}

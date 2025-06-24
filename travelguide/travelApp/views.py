@@ -51,7 +51,8 @@ def plan_trip(request):
                     start_destination__iexact=cd['start_destination'],
                     end_destination__iexact=cd['end_destination'],
                     start_date__gte=cd['start_date'],
-                    end_date__lte=cd['end_date']
+                    end_date__lte=cd['end_date'],
+                    number_of_people__gte=cd['number_of_people']
                 )
                 if not available_trips.exists():
                     no_trips = True

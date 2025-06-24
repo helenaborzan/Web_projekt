@@ -12,8 +12,29 @@ class SignUpForm(UserCreationForm):
         fields = ('username', 'email', 'password1', 'password2')
 
 class TripForm(forms.Form):
-    start_destination = forms.CharField(label="Start Destination", required=True)
-    end_destination = forms.CharField(label="End Destination", required=True)
-    start_date = forms.DateField(widget=forms.DateInput(attrs={'type': 'date'}))
-    end_date = forms.DateField(widget=forms.DateInput(attrs={'type': 'date'}))
+    start_destination = forms.CharField(
+        label="Start Destination",
+        widget=forms.TextInput(attrs={'class': 'form-control'})
+    )
+    end_destination = forms.CharField(
+        label="End Destination",
+        widget=forms.TextInput(attrs={'class': 'form-control'})
+    )
+    start_date = forms.DateField(
+        widget=forms.DateInput(attrs={
+            'type': 'date',
+            'class': 'form-control'
+        })
+    )
+    end_date = forms.DateField(
+        widget=forms.DateInput(attrs={
+            'type': 'date',
+            'class': 'form-control'
+        })
+    )
+    number_of_people = forms.IntegerField(
+        label="Number of People",
+        min_value=1,
+        widget=forms.NumberInput(attrs={'class': 'form-control'})
+    )
 

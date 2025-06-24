@@ -3,6 +3,8 @@ from django.contrib.auth.models import User
 
 class TravelPlan(models.Model):
     name = models.CharField(max_length=100)
+    description = models.TextField(blank=True)
+    picture_url = models.URLField(max_length=500, blank=True) 
     start_destination = models.CharField(max_length=100)
     end_destination = models.CharField(max_length=100)
     start_date = models.DateField()
@@ -28,6 +30,7 @@ class MyTrip(models.Model):
     end_destination = models.CharField(max_length=100)
     start_date = models.DateField()
     end_date = models.DateField()
+    number_of_people = models.PositiveIntegerField(default=1)
     booked_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
