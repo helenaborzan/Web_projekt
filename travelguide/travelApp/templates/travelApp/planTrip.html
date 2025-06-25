@@ -160,6 +160,7 @@
       </h4>
       <div class="trip-grid">
         {% for trip in available_trips %}
+        <a href="{% url 'travelApp:trip_details' trip.id %}" class="text-decoration-none text-dark">
           <div class="trip-card">
             {% if trip.picture_url %}
               <img src="{{ trip.picture_url }}" alt="{{ trip.name }}" class="trip-image">
@@ -170,7 +171,7 @@
                 <p class="trip-meta">{{ trip.description }}</p>
                 <p class="trip-meta"><i class="bi bi-geo-alt me-1"></i>{{ trip.start_destination }} → {{ trip.end_destination }}</p>
                 <p class="trip-meta"><i class="bi bi-calendar me-1"></i>{{ trip.start_date }} to {{ trip.end_date }}</p>
-                <p class="trip-meta"><i class="bi bi-people me-1"></i>{{ trip.number_of_people }} people · ${{ trip.price }}</p>
+                <p class="trip-meta"><i class="bi bi-people me-1"></i>{{ trip.number_of_people }} seats available · ${{ trip.price }}</p>
               </div>
               <form method="POST">
                 {% csrf_token %}
@@ -182,6 +183,7 @@
               </form>
             </div>
           </div>
+        </a>
         {% endfor %}
       </div>
     {% endif %}

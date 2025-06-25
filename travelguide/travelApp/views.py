@@ -9,6 +9,7 @@ from django.db import models
 from django.db.models import Sum
 from django.db.models.functions import Now
 from django.utils.timezone import now
+from django.contrib import messages
 
 def home(request):
     return render (request, 'travelApp/home.html')
@@ -140,3 +141,33 @@ def profile(request):
         'upcoming_trips': upcoming_trips,
         'account': account,
     })
+
+@login_required
+def trip_details(request, trip_id):
+    trip = get_object_or_404(TravelPlan, id=trip_id)
+
+    if request.method == 'POST':
+        num_people = int(request.POST.get('number_of_people', 1))
+
+        already_booked = MyTrip.objects.filter(user=request.user, travel_plan=trip).exists()
+
+        if already_booked:
+            messages.error(request, "You have already booked this trip.")
+        elif num_people > trip.number_of_people:
+            messages.error(request, "Not enough available spots for the number of people selected.")
+        else:
+            MyTrip.objects.create(
+                user=request.user,
+                travel_plan=trip,
+                start_destination=trip.start_destination,
+                end_destination=trip.end_destination,
+                start_date=trip.start_date,
+                end_date=trip.end_date,
+                number_of_people=num_people
+            )
+            trip.number_of_people -= num_people
+            trip.save()
+            messages.success(request, "Trip booked successfully!")
+            return redirect('travelApp:my_trips')
+
+    return render(request, 'travelApp/tripDetails.html', {'trip': trip})
