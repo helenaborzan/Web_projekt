@@ -46,6 +46,25 @@
   .btn-back {
     margin-top: 2rem;
   }
+
+  .already-booked-message {
+    background-color: #e3f2fd;
+    border: 2px solid #2196f3;
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin: 2rem 0;
+    text-align: center;
+  }
+
+  .already-booked-message h4 {
+    color: #1976d2;
+    margin-bottom: 0.5rem;
+  }
+
+  .already-booked-message p {
+    color: #424242;
+    margin: 0;
+  }
 </style>
 {% endblock %}
 
@@ -63,26 +82,25 @@
   <div class="trip-meta"><i class="bi bi-people"></i><strong>Available spots:</strong> {{ trip.number_of_people }}</div>
   <div class="trip-meta"><i class="bi bi-cash"></i><strong>Price:</strong> ${{ trip.price }}</div>
 
-  <form method="POST" class="mt-4">
-    {% csrf_token %}
-    <input type="hidden" name="book_trip_id" value="{{ trip.id }}">
-    <label for="number_of_people" class="form-label">Number of People</label>
-    <input type="number" name="number_of_people" value="1" min="1" max="{{ trip.number_of_people }}" class="form-control mb-3" required>
-    <button type="submit" class="btn btn-success w-100">
-      <i class="bi bi-check2-circle me-1"></i>Book This Trip
-    </button>
-  </form>
+  {% if already_booked %}
+    <div class="already-booked-message">
+      <h4><i class="bi bi-check-circle-fill me-2"></i>You Already Booked This Trip</h4>
+      <p><strong>Number of people:</strong> {{ user_booking.number_of_people }}</p>
+    </div>
+  {% else %}
+    <form method="POST" class="mt-4">
+      {% csrf_token %}
+      <input type="hidden" name="book_trip_id" value="{{ trip.id }}">
+      <label for="number_of_people" class="form-label">Number of People</label>
+      <input type="number" name="number_of_people" value="1" min="1" max="{{ trip.number_of_people }}" class="form-control mb-3" required>
+      <button type="submit" class="btn btn-success w-100">
+        <i class="bi bi-check2-circle me-1"></i>Book This Trip
+      </button>
+    </form>
+  {% endif %}
 
   <a href="{% url 'travelApp:plan_trip' %}" class="btn btn-outline-secondary w-100 btn-back">
     <i class="bi bi-arrow-left me-1"></i>Back to Search
   </a>
 </div>
 {% endblock %}
-{% if messages %}
-  {% for message in messages %}
-    <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
-      {{ message }}
-      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-    </div>
-  {% endfor %}
-{% endif %}

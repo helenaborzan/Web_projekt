@@ -147,11 +147,12 @@ def profile(request):
 @login_required
 def trip_details(request, trip_id):
     trip = get_object_or_404(TravelPlan, id=trip_id)
+    
+    user_booking = MyTrip.objects.filter(user=request.user, travel_plan=trip).first()
+    already_booked = user_booking is not None
 
     if request.method == 'POST':
         num_people = int(request.POST.get('number_of_people', 1))
-
-        already_booked = MyTrip.objects.filter(user=request.user, travel_plan=trip).exists()
 
         if already_booked:
             messages.error(request, "You have already booked this trip.")
@@ -172,7 +173,12 @@ def trip_details(request, trip_id):
             messages.success(request, "Trip booked successfully!")
             return redirect('travelApp:my_trips')
 
-    return render(request, 'travelApp/tripDetails.html', {'trip': trip})
+    context = {
+        'trip': trip,
+        'already_booked': already_booked,
+        'user_booking': user_booking,
+    }
+    return render(request, 'travelApp/tripDetails.html', context)
 
 @staff_member_required
 def add_trip(request):
