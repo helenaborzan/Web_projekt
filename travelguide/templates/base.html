@@ -36,6 +36,9 @@
       </a>
       <div class="ms-auto d-flex gap-4 align-items-center">
         <a class="nav-link text-white" href="{% url 'travelApp:home' %}">Home</a>
+        {% if user.is_staff %}
+          <a class="nav-link text-white" href="{% url 'travelApp:add_trip' %}">Add Trip</a>
+        {% endif %}
         <a class="nav-link text-white" href="{% url 'travelApp:plan_trip' %}">Plan a trip</a>
         <a class="nav-link text-white" href="{% url 'travelApp:my_trips' %}">My trips</a>
         <a class="nav-link text-white" href="{% url 'travelApp:profile' %}">Profile</a>

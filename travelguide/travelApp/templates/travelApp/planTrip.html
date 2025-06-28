@@ -173,14 +173,9 @@
                 <p class="trip-meta"><i class="bi bi-calendar me-1"></i>{{ trip.start_date }} to {{ trip.end_date }}</p>
                 <p class="trip-meta"><i class="bi bi-people me-1"></i>{{ trip.number_of_people }} seats available · ${{ trip.price }}</p>
               </div>
-              <form method="POST">
-                {% csrf_token %}
-                <input type="hidden" name="book_trip_id" value="{{ trip.id }}">
-                <input type="hidden" name="number_of_people" value="{{ form.number_of_people.value|default:1 }}">
-                <button type="submit" class="btn btn-success book-button">
-                  <i class="bi bi-check2-circle me-1"></i>Book Now
-                </button>
-              </form>
+              <button class="btn btn-outline-primary book-button" type="button">
+                <i class="bi bi-eye me-1"></i>See Details
+              </button>
             </div>
           </div>
         </a>

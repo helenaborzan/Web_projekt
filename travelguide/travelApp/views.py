@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpResponse
-from .forms import SignUpForm, TripForm
+from .forms import SignUpForm, TripForm, TravelPlanForm
 from .models import Account, MyTrip, TravelPlan
 from django.contrib.auth import login, authenticate
 from django.contrib.auth import logout
@@ -10,6 +10,8 @@ from django.db.models import Sum
 from django.db.models.functions import Now
 from django.utils.timezone import now
 from django.contrib import messages
+from django.contrib.admin.views.decorators import staff_member_required
+
 
 def home(request):
     return render (request, 'travelApp/home.html')
@@ -171,3 +173,18 @@ def trip_details(request, trip_id):
             return redirect('travelApp:my_trips')
 
     return render(request, 'travelApp/tripDetails.html', {'trip': trip})
+
+@staff_member_required
+def add_trip(request):
+    if request.method == 'POST':
+        form = TravelPlanForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('travelApp:trip_success')
+    else:
+        form = TravelPlanForm()
+    return render(request, 'travelApp/addTrip.html', {'form': form})
+
+@staff_member_required
+def trip_success(request):
+    return render(request, 'travelApp/tripSuccess.html')

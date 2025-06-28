@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="d-flex justify-content-center" style="margin-top: 10rem;">
+  <div class="text-center">
+    <h1 class="display-4 text-success mb-4">Trip Created Successfully!</h1>
+    <a href="{% url 'travelApp:add_trip' %}" class="btn btn-primary btn-lg">
+      Add New Trip
+    </a>
+  </div>
+</div>
+{% endblock %}
