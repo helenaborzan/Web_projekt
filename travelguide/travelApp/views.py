@@ -11,7 +11,10 @@ from django.db.models.functions import Now
 from django.utils.timezone import now
 from django.contrib import messages
 from django.contrib.admin.views.decorators import staff_member_required
-
+from django.contrib.auth.models import User
+from django.utils import timezone
+from django.core.paginator import Paginator
+from .models import TravelPlan, MyTrip, TripQuestion, TripAnswer
 
 def home(request):
     return render (request, 'travelApp/home.html')
@@ -152,31 +155,75 @@ def trip_details(request, trip_id):
     already_booked = user_booking is not None
 
     if request.method == 'POST':
-        num_people = int(request.POST.get('number_of_people', 1))
+        if 'book_trip_id' in request.POST:
+            num_people = int(request.POST.get('number_of_people', 1))
 
-        if already_booked:
-            messages.error(request, "You have already booked this trip.")
-        elif num_people > trip.number_of_people:
-            messages.error(request, "Not enough available spots for the number of people selected.")
-        else:
-            MyTrip.objects.create(
-                user=request.user,
-                travel_plan=trip,
-                start_destination=trip.start_destination,
-                end_destination=trip.end_destination,
-                start_date=trip.start_date,
-                end_date=trip.end_date,
-                number_of_people=num_people
-            )
-            trip.number_of_people -= num_people
-            trip.save()
-            messages.success(request, "Trip booked successfully!")
-            return redirect('travelApp:my_trips')
+            if already_booked:
+                messages.error(request, "You have already booked this trip.")
+            elif num_people > trip.number_of_people:
+                messages.error(request, "Not enough available spots for the number of people selected.")
+            else:
+                MyTrip.objects.create(
+                    user=request.user,
+                    travel_plan=trip,
+                    start_destination=trip.start_destination,
+                    end_destination=trip.end_destination,
+                    start_date=trip.start_date,
+                    end_date=trip.end_date,
+                    number_of_people=num_people
+                )
+                trip.number_of_people -= num_people
+                trip.save()
+                messages.success(request, "Trip booked successfully!")
+                return redirect('travelApp:my_trips')
+
+        elif 'submit_question' in request.POST:
+            question_text = request.POST.get('question_text', '').strip()
+            if question_text:
+                TripQuestion.objects.create(
+                    trip=trip,
+                    user=request.user,
+                    question_text=question_text
+                )
+                messages.success(request, "Your question has been submitted successfully!")
+            else:
+                messages.error(request, "Please enter a question before submitting.")
+            return redirect('travelApp:trip_details', trip_id=trip.id)
+
+        elif 'submit_answer' in request.POST and request.user.is_staff:
+            question_id = request.POST.get('question_id')
+            answer_text = request.POST.get('answer_text', '').strip()
+            
+            if question_id and answer_text:
+                try:
+                    question = TripQuestion.objects.get(id=question_id, trip=trip)
+                    if not hasattr(question, 'answer'):
+                        TripAnswer.objects.create(
+                            question=question,
+                            admin_user=request.user,
+                            answer_text=answer_text
+                        )
+                        messages.success(request, "Answer submitted successfully!")
+                    else:
+                        messages.error(request, "This question has already been answered.")
+                except TripQuestion.DoesNotExist:
+                    messages.error(request, "Question not found.")
+            else:
+                messages.error(request, "Please provide an answer before submitting.")
+            return redirect('travelApp:trip_details', trip_id=trip.id)
+
+    questions = TripQuestion.objects.filter(trip=trip).select_related('user').prefetch_related('answer__admin_user')
+    
+    paginator = Paginator(questions, 10)  
+    page_number = request.GET.get('page')
+    questions_page = paginator.get_page(page_number)
 
     context = {
         'trip': trip,
         'already_booked': already_booked,
         'user_booking': user_booking,
+        'questions': questions_page,
+        'is_staff': request.user.is_staff,
     }
     return render(request, 'travelApp/tripDetails.html', context)
 

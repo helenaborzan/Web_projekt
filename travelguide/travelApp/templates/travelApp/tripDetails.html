@@ -65,11 +65,181 @@
     color: #424242;
     margin: 0;
   }
+
+  .qa-section {
+    margin-top: 3rem;
+    padding-top: 2rem;
+    border-top: 2px solid #e9ecef;
+  }
+
+  .qa-header {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #212529;
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+  }
+
+  .qa-header i {
+    margin-right: 0.5rem;
+    color: #0d6efd;
+  }
+
+  .question-form {
+    background: #f8f9fa;
+    padding: 1.5rem;
+    border-radius: 12px;
+    margin-bottom: 2rem;
+  }
+
+  .question-form h5 {
+    color: #495057;
+    margin-bottom: 1rem;
+  }
+
+  .question-item {
+    background: #ffffff;
+    border: 1px solid #e9ecef;
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  }
+
+  .question-header {
+    display: flex;
+    justify-content: between;
+    align-items: flex-start;
+    margin-bottom: 0.75rem;
+  }
+
+  .question-user {
+    font-weight: 600;
+    color: #0d6efd;
+    font-size: 0.9rem;
+  }
+
+  .question-date {
+    font-size: 0.8rem;
+    color: #6c757d;
+    margin-left: auto;
+  }
+
+  .question-text {
+    color: #495057;
+    margin-bottom: 1rem;
+    line-height: 1.5;
+  }
+
+  .answer-section {
+    background: #e8f5e8;
+    border-left: 4px solid #28a745;
+    padding: 1rem;
+    border-radius: 0 8px 8px 0;
+    margin-top: 1rem;
+  }
+
+  .answer-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.5rem;
+  }
+
+  .answer-admin {
+    font-weight: 600;
+    color: #28a745;
+    font-size: 0.9rem;
+  }
+
+  .answer-date {
+    font-size: 0.8rem;
+    color: #6c757d;
+  }
+
+  .answer-text {
+    color: #495057;
+    line-height: 1.5;
+  }
+
+  .admin-answer-form {
+    background: #fff3cd;
+    border: 1px solid #ffeaa7;
+    border-radius: 8px;
+    padding: 1rem;
+    margin-top: 1rem;
+  }
+
+  .admin-answer-form h6 {
+    color: #856404;
+    margin-bottom: 0.75rem;
+  }
+
+  .status-badge {
+    font-size: 0.75rem;
+    padding: 0.25rem 0.5rem;
+    border-radius: 12px;
+    font-weight: 500;
+  }
+
+  .status-answered {
+    background-color: #d4edda;
+    color: #155724;
+  }
+
+  .status-pending {
+    background-color: #fff3cd;
+    color: #856404;
+  }
+
+  .no-questions {
+    text-align: center;
+    padding: 2rem;
+    color: #6c757d;
+    font-style: italic;
+  }
+
+  .pagination-wrapper {
+    margin-top: 2rem;
+    display: flex;
+    justify-content: center;
+  }
+
+  @media (max-width: 768px) {
+    .question-header {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+    
+    .question-date {
+      margin-left: 0;
+      margin-top: 0.25rem;
+    }
+    
+    .answer-header {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+    
+    .answer-date {
+      margin-top: 0.25rem;
+    }
+  }
 </style>
 {% endblock %}
 
 {% block content %}
 <div class="container trip-details-container">
+  {% if messages %}
+    {% for message in messages %}
+      <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+        {{ message }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+      </div>
+    {% endfor %}
+  {% endif %}
+
   {% if trip.picture_url %}
     <img src="{{ trip.picture_url }}" alt="{{ trip.name }}" class="trip-image">
   {% endif %}
@@ -98,6 +268,118 @@
       </button>
     </form>
   {% endif %}
+
+  <div class="qa-section">
+    <div class="qa-header">
+      <i class="bi bi-chat-dots"></i>
+      Questions & Answers
+    </div>
+
+    <div class="question-form">
+      <h5><i class="bi bi-question-circle me-2"></i>Have a question about this trip?</h5>
+      <form method="POST">
+        {% csrf_token %}
+        <div class="mb-3">
+          <label for="question_text" class="form-label">Your Question</label>
+          <textarea name="question_text" id="question_text" class="form-control" rows="3" 
+                    placeholder="Ask anything about this trip..." required></textarea>
+        </div>
+        <button type="submit" name="submit_question" class="btn btn-primary">
+          <i class="bi bi-send me-1"></i>Submit Question
+        </button>
+      </form>
+    </div>
+
+    {% if questions %}
+      {% for question in questions %}
+        <div class="question-item">
+          <div class="question-header">
+            <div>
+              <span class="question-user">
+                <i class="bi bi-person-circle me-1"></i>{{ question.user.username }}
+              </span>
+              {% if question.is_answered %}
+                <span class="status-badge status-answered ms-2">
+                  <i class="bi bi-check-circle me-1"></i>Answered
+                </span>
+              {% else %}
+                <span class="status-badge status-pending ms-2">
+                  <i class="bi bi-clock me-1"></i>Pending
+                </span>
+              {% endif %}
+            </div>
+            <div class="question-date">{{ question.created_at|date:"M d, Y - g:i A" }}</div>
+          </div>
+          
+          <div class="question-text">{{ question.question_text }}</div>
+
+          {% if question.answer %}
+            <div class="answer-section">
+              <div class="answer-header">
+                <span class="answer-admin">
+                  <i class="bi bi-shield-check me-1"></i>{{ question.answer.admin_user.username }} (Admin)
+                </span>
+                <span class="answer-date">{{ question.answer.created_at|date:"M d, Y - g:i A" }}</span>
+              </div>
+              <div class="answer-text">{{ question.answer.answer_text }}</div>
+            </div>
+          {% elif is_staff %}
+            <div class="admin-answer-form">
+              <h6><i class="bi bi-reply me-2"></i>Reply to this question</h6>
+              <form method="POST">
+                {% csrf_token %}
+                <input type="hidden" name="question_id" value="{{ question.id }}">
+                <div class="mb-3">
+                  <textarea name="answer_text" class="form-control" rows="3" 
+                            placeholder="Provide a helpful answer..." required></textarea>
+                </div>
+                <button type="submit" name="submit_answer" class="btn btn-success btn-sm">
+                  <i class="bi bi-check2 me-1"></i>Submit Answer
+                </button>
+              </form>
+            </div>
+          {% endif %}
+        </div>
+      {% endfor %}
+
+      {% if questions.has_other_pages %}
+        <div class="pagination-wrapper">
+          <nav aria-label="Questions pagination">
+            <ul class="pagination">
+              {% if questions.has_previous %}
+                <li class="page-item">
+                  <a class="page-link" href="?page={{ questions.previous_page_number }}">Previous</a>
+                </li>
+              {% endif %}
+
+              {% for num in questions.paginator.page_range %}
+                {% if questions.number == num %}
+                  <li class="page-item active">
+                    <span class="page-link">{{ num }}</span>
+                  </li>
+                {% else %}
+                  <li class="page-item">
+                    <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                  </li>
+                {% endif %}
+              {% endfor %}
+
+              {% if questions.has_next %}
+                <li class="page-item">
+                  <a class="page-link" href="?page={{ questions.next_page_number }}">Next</a>
+                </li>
+              {% endif %}
+            </ul>
+          </nav>
+        </div>
+      {% endif %}
+    {% else %}
+      <div class="no-questions">
+        <i class="bi bi-chat-dots" style="font-size: 2rem; margin-bottom: 1rem; display: block;"></i>
+        No questions yet. Be the first to ask something about this trip!
+      </div>
+    {% endif %}
+  </div>
 
   <a href="{% url 'travelApp:plan_trip' %}" class="btn btn-outline-secondary w-100 btn-back">
     <i class="bi bi-arrow-left me-1"></i>Back to Search
