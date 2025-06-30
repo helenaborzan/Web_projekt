@@ -11,5 +11,8 @@ urlpatterns = [
     path('profile/', views.profile, name='profile'),
     path('trip/<int:trip_id>/', views.trip_details, name='trip_details'),
     path('add-trip/', views.add_trip, name='add_trip'),
-    path('trip-success/', views.trip_success, name='trip_success')
+    path('trip-success/', views.trip_success, name='trip_success'),
+    path('edit-trips/', views.edit_trips, name='edit_trips'),
+    path('delete-trip/<int:trip_id>/', views.delete_trip, name='delete_trip'),
+
 ]

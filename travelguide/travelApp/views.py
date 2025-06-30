@@ -273,3 +273,15 @@ def add_trip(request):
 @staff_member_required
 def trip_success(request):
     return render(request, 'travelApp/tripSuccess.html')
+
+@staff_member_required
+def edit_trips(request):
+    upcoming_trips = TravelPlan.objects.filter(start_date__gte=now())
+    return render(request, 'travelApp/editTrips.html', {'upcoming_trips': upcoming_trips})
+
+@staff_member_required
+def delete_trip(request, trip_id):
+    trip = get_object_or_404(TravelPlan, id=trip_id)
+    trip.delete()
+    messages.success(request, "Trip deleted successfully.")
+    return redirect('travelApp:edit_trips')

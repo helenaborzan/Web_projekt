@@ -359,7 +359,6 @@
   </div>
 
   {% if current_trips or upcoming_trips or past_trips %}
-    <!-- Current Trips Section -->
     {% if current_trips %}
       <div class="trips-section current-section">
         <div class="section-header">
@@ -422,7 +421,6 @@
       </div>
     {% endif %}
 
-    <!-- Upcoming Trips Section -->
     {% if upcoming_trips %}
       <div class="trips-section upcoming-section">
         <div class="section-header">
@@ -492,7 +490,6 @@
       </div>
     {% endif %}
 
-    <!-- Past Trips Section -->
     {% if past_trips %}
       <div class="trips-section past-section">
         <div class="section-header">
@@ -533,7 +530,6 @@
                   <a href="{% url 'travelApp:trip_details' trip.travel_plan.id %}" class="btn-details">
                     <i class="bi bi-eye me-2"></i>View Details
                   </a>
-                  <!-- Cancel button is hidden for past trips via CSS -->
                   <form method="POST" style="display: inline;">
                     {% csrf_token %}
                     <input type="hidden" name="delete_trip_id" value="{{ trip.id }}">
@@ -564,7 +560,6 @@
     {% endif %}
 
   {% else %}
-    <!-- Empty state when no trips at all -->
     <div class="empty-state">
       <div class="empty-state-icon">
         <i class="bi bi-suitcase"></i>

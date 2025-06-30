@@ -38,6 +38,7 @@
         <a class="nav-link text-white" href="{% url 'travelApp:home' %}">Home</a>
         {% if user.is_staff %}
           <a class="nav-link text-white" href="{% url 'travelApp:add_trip' %}">Add Trip</a>
+          <a class="nav-link text-white" href="{% url 'travelApp:edit_trips' %}">Edit Trips</a>
         {% endif %}
         <a class="nav-link text-white" href="{% url 'travelApp:plan_trip' %}">Plan a trip</a>
         <a class="nav-link text-white" href="{% url 'travelApp:my_trips' %}">My trips</a>
