@@ -113,6 +113,11 @@ def plan_trip(request):
     })
 
 
+from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib.auth.decorators import login_required
+from django.utils import timezone
+from datetime import date
+
 @login_required
 def my_trips(request):
     if request.method == 'POST' and 'delete_trip_id' in request.POST:
@@ -126,8 +131,35 @@ def my_trips(request):
         trip.delete()
         return redirect('travelApp:my_trips')
 
-    trips = MyTrip.objects.filter(user=request.user).order_by('-booked_at')
-    return render(request, 'travelApp/myTrips.html', {'trips': trips})
+    all_trips = MyTrip.objects.filter(user=request.user).order_by('-start_date')
+    
+    today = date.today()
+    
+    current_trips = []
+    upcoming_trips = []
+    past_trips = []
+    
+    for trip in all_trips:
+        if trip.start_date <= today <= trip.end_date:
+            current_trips.append(trip)
+        elif trip.start_date > today:
+            upcoming_trips.append(trip)
+        else:
+            past_trips.append(trip)
+    
+    current_trips.sort(key=lambda x: x.start_date, reverse=True)
+    
+    upcoming_trips.sort(key=lambda x: x.start_date)
+    
+    past_trips.sort(key=lambda x: x.end_date, reverse=True)
+    
+    context = {
+        'current_trips': current_trips,
+        'upcoming_trips': upcoming_trips,
+        'past_trips': past_trips,
+    }
+    
+    return render(request, 'travelApp/myTrips.html', context)
 
 @login_required
 def profile(request):
