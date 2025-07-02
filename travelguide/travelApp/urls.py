@@ -14,5 +14,9 @@ urlpatterns = [
     path('trip-success/', views.trip_success, name='trip_success'),
     path('edit-trips/', views.edit_trips, name='edit_trips'),
     path('delete-trip/<int:trip_id>/', views.delete_trip, name='delete_trip'),
-
+    path('api/trips/', views.TravelPlanListCreateAPIView.as_view(), name='api_trips'),
+    path('api/accounts/', views.AccountListCreateAPIView.as_view(), name='api_accounts'),
+    path('api/my-trips/', views.MyTripListCreateAPIView.as_view(), name='api_my_trips'),
+    path('api/trip-questions/', views.TripQuestionListCreateAPIView.as_view(), name='api_trip_questions'),
+    path('api/trip-answers/', views.TripAnswerListCreateAPIView.as_view(), name='api_trip_answers')
 ]

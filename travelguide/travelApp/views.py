@@ -15,6 +15,9 @@ from django.contrib.auth.models import User
 from django.utils import timezone
 from django.core.paginator import Paginator
 from .models import TravelPlan, MyTrip, TripQuestion, TripAnswer
+from rest_framework import generics
+from .models import TravelPlan
+from .serializers import TravelPlanSerializer, AccountSerializer, MyTripSerializer, TripQuestionSerializer, TripAnswerSerializer
 
 def home(request):
     return render (request, 'travelApp/home.html')
@@ -285,3 +288,23 @@ def delete_trip(request, trip_id):
     trip.delete()
     messages.success(request, "Trip deleted successfully.")
     return redirect('travelApp:edit_trips')
+
+class TravelPlanListCreateAPIView(generics.ListCreateAPIView):
+    queryset = TravelPlan.objects.all()
+    serializer_class = TravelPlanSerializer
+    
+class AccountListCreateAPIView(generics.ListCreateAPIView):
+    queryset = Account.objects.all()
+    serializer_class = AccountSerializer
+
+class MyTripListCreateAPIView(generics.ListCreateAPIView):
+    queryset = MyTrip.objects.all()
+    serializer_class = MyTripSerializer
+
+class TripQuestionListCreateAPIView(generics.ListCreateAPIView):
+    queryset = TripQuestion.objects.all()
+    serializer_class = TripQuestionSerializer
+
+class TripAnswerListCreateAPIView(generics.ListCreateAPIView):
+    queryset = TripAnswer.objects.all()
+    serializer_class = TripAnswerSerializer
