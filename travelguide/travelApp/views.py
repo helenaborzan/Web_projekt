@@ -1,23 +1,23 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from django.http import HttpResponse
 from .forms import SignUpForm, TripForm, TravelPlanForm
 from .models import Account, MyTrip, TravelPlan
 from django.contrib.auth import login, authenticate
 from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required
-from django.db import models
 from django.db.models import Sum
 from django.db.models.functions import Now
 from django.utils.timezone import now
 from django.contrib import messages
 from django.contrib.admin.views.decorators import staff_member_required
-from django.contrib.auth.models import User
-from django.utils import timezone
 from django.core.paginator import Paginator
 from .models import TravelPlan, MyTrip, TripQuestion, TripAnswer
 from rest_framework import generics
 from .models import TravelPlan
 from .serializers import TravelPlanSerializer, AccountSerializer, MyTripSerializer, TripQuestionSerializer, TripAnswerSerializer
+from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib.auth.decorators import login_required
+from datetime import date
+from rest_framework.permissions import IsAdminUser
 
 def home(request):
     return render (request, 'travelApp/home.html')
@@ -114,12 +114,6 @@ def plan_trip(request):
         'form_submitted': form_submitted,
         'no_trips': no_trips
     })
-
-
-from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib.auth.decorators import login_required
-from django.utils import timezone
-from datetime import date
 
 @login_required
 def my_trips(request):
@@ -279,8 +273,7 @@ def trip_success(request):
 
 @staff_member_required
 def edit_trips(request):
-    upcoming_trips = TravelPlan.objects.filter(start_date__gte=now())
-    return render(request, 'travelApp/editTrips.html', {'upcoming_trips': upcoming_trips})
+    return render(request, 'travelApp/editTrips.html')
 
 @staff_member_required
 def delete_trip(request, trip_id):
@@ -308,3 +301,15 @@ class TripQuestionListCreateAPIView(generics.ListCreateAPIView):
 class TripAnswerListCreateAPIView(generics.ListCreateAPIView):
     queryset = TripAnswer.objects.all()
     serializer_class = TripAnswerSerializer
+
+class UpcomingTripsAPIView(generics.ListAPIView):
+    serializer_class = TravelPlanSerializer
+    permission_classes = [IsAdminUser]
+
+    def get_queryset(self):
+        return TravelPlan.objects.filter(start_date__gte=now())
+    
+class TravelPlanDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = TravelPlan.objects.all()
+    serializer_class = TravelPlanSerializer
+    permission_classes = [IsAdminUser]

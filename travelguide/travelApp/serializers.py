@@ -1,6 +1,5 @@
 from rest_framework import serializers
 from .models import TravelPlan, Account, MyTrip, TripQuestion, TripAnswer
-from django.contrib.auth.models import User
 
 class TravelPlanSerializer(serializers.ModelSerializer):
     class Meta:

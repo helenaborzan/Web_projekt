@@ -18,5 +18,7 @@ urlpatterns = [
     path('api/accounts/', views.AccountListCreateAPIView.as_view(), name='api_accounts'),
     path('api/my-trips/', views.MyTripListCreateAPIView.as_view(), name='api_my_trips'),
     path('api/trip-questions/', views.TripQuestionListCreateAPIView.as_view(), name='api_trip_questions'),
-    path('api/trip-answers/', views.TripAnswerListCreateAPIView.as_view(), name='api_trip_answers')
+    path('api/trip-answers/', views.TripAnswerListCreateAPIView.as_view(), name='api_trip_answers'),
+    path('api/upcoming-trips/', views.UpcomingTripsAPIView.as_view(), name='api_upcoming_trips'),
+    path('api/trips/<int:pk>/', views.TravelPlanDetailAPIView.as_view(), name='api_trip_detail')
 ]
