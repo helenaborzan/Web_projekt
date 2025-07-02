@@ -94,7 +94,6 @@
     color: #fff;
   }
 
-  /* New styles for additional sections */
   .features-section {
     padding: 5rem 0;
     background-color: #f8f9fa;
@@ -229,7 +228,7 @@
       {% if user.is_authenticated %}
         <h1>Welcome, {{ user.username }}!</h1>
         <p>Glad to have you back. Ready to plan your next trip?</p>
-        <a href="#" class="btn btn-primary btn-lg mt-4">
+        <a href="{% url 'travelApp:plan_trip' %}" class="btn btn-primary btn-lg mt-4">
           <i class="bi bi-globe me-2"></i>Start Planning
         </a>
       {% else %}
