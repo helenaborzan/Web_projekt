@@ -24,25 +24,66 @@
     </table>
   </div>
 </div>
+
+<div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <form id="editForm" class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="editModalLabel">Edit Trip</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="edit-trip-id">
+        <div class="mb-3">
+          <label class="form-label">Name</label>
+          <input type="text" class="form-control" id="edit-name" required>
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Start Destination</label>
+          <input type="text" class="form-control" id="edit-start-destination" required>
+        </div>
+        <div class="mb-3">
+          <label class="form-label">End Destination</label>
+          <input type="text" class="form-control" id="edit-end-destination" required>
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Start Date</label>
+          <input type="date" class="form-control" id="edit-start-date" required>
+        </div>
+        <div class="mb-3">
+          <label class="form-label">End Date</label>
+          <input type="date" class="form-control" id="edit-end-date" required>
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Seats</label>
+          <input type="number" class="form-control" id="edit-seats" required min="1">
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Price</label>
+          <input type="number" step="0.01" class="form-control" id="edit-price" required>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="submit" class="btn btn-primary">Save Changes</button>
+      </div>
+    </form>
+  </div>
+</div>
 {% endblock %}
 
 {% block extra_scripts %}
 <script>
   document.addEventListener("DOMContentLoaded", () => {
-    console.log("Page loaded");
     loadTrips();
   });
 
   function loadTrips() {
-    console.log("Fetching trips...");
     fetch("/travelApp/api/upcoming-trips/")
       .then(res => {
         if (!res.ok) throw new Error(`API error: ${res.status}`);
         return res.json();
       })
       .then(trips => {
-        console.log("Trips fetched:", trips);
-
         const tbody = document.getElementById("trip-table-body");
         tbody.innerHTML = "";
 
@@ -59,8 +100,11 @@
             <td>${trip.start_date} to ${trip.end_date}</td>
             <td>${trip.number_of_people}</td>
             <td>
+              <button class="btn btn-warning btn-sm me-2" onclick="openEditModal(${trip.id})">
+                <i class="bi bi-pencil-square"></i>
+              </button>
               <button class="btn btn-danger btn-sm" onclick="deleteTrip(${trip.id})">
-                <i class="bi bi-trash3"></i> Delete
+                <i class="bi bi-trash3"></i>
               </button>
             </td>
           `;
@@ -100,5 +144,64 @@
       alert("Error deleting trip.");
     });
   }
+
+  function openEditModal(tripId) {
+    fetch(`/travelApp/api/trips/${tripId}/`)
+      .then(res => res.json())
+      .then(trip => {
+        document.getElementById("edit-trip-id").value = trip.id;
+        document.getElementById("edit-name").value = trip.name;
+        document.getElementById("edit-start-destination").value = trip.start_destination;
+        document.getElementById("edit-end-destination").value = trip.end_destination;
+        document.getElementById("edit-start-date").value = trip.start_date;
+        document.getElementById("edit-end-date").value = trip.end_date;
+        document.getElementById("edit-seats").value = trip.number_of_people;
+        document.getElementById("edit-price").value = trip.price;
+
+        const modal = new bootstrap.Modal(document.getElementById('editModal'));
+        modal.show();
+      })
+      .catch(err => {
+        console.error("Error loading trip for edit:", err);
+        alert("Failed to load trip.");
+      });
+  }
+
+  document.getElementById("editForm").addEventListener("submit", function (e) {
+    e.preventDefault();
+    const id = document.getElementById("edit-trip-id").value;
+
+    const data = {
+      name: document.getElementById("edit-name").value,
+      start_destination: document.getElementById("edit-start-destination").value,
+      end_destination: document.getElementById("edit-end-destination").value,
+      start_date: document.getElementById("edit-start-date").value,
+      end_date: document.getElementById("edit-end-date").value,
+      number_of_people: parseInt(document.getElementById("edit-seats").value),
+      price: parseFloat(document.getElementById("edit-price").value),
+    };
+
+    fetch(`/travelApp/api/trips/${id}/`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        "X-CSRFToken": getCSRFToken()
+      },
+      body: JSON.stringify(data)
+    })
+    .then(res => {
+      if (res.ok) {
+        alert("Trip updated.");
+        bootstrap.Modal.getInstance(document.getElementById('editModal')).hide();
+        loadTrips();
+      } else {
+        alert("Failed to update trip.");
+      }
+    })
+    .catch(err => {
+      console.error("Update failed:", err);
+      alert("Error updating trip.");
+    });
+  });
 </script>
 {% endblock %}
