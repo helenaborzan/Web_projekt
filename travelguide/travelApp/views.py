@@ -81,33 +81,6 @@ def plan_trip(request):
                 if not available_trips.exists():
                     no_trips = True
 
-        elif 'book_trip_id' in request.POST:
-            trip_id = request.POST.get('book_trip_id')
-            num_people = int(request.POST.get('number_of_people', 1))
-
-            plan = get_object_or_404(TravelPlan, id=trip_id)
-
-            if plan.number_of_people >= num_people:
-                MyTrip.objects.create(
-                    user=request.user,
-                    travel_plan=plan,
-                    start_destination=plan.start_destination,
-                    end_destination=plan.end_destination,
-                    start_date=plan.start_date,
-                    end_date=plan.end_date,
-                    number_of_people=num_people
-                )
-
-                plan.number_of_people -= num_people
-                plan.save()
-
-                return redirect('travelApp:my_trips')
-            else:
-                form = TripForm()
-                available_trips = []
-                no_trips = True
-                form_submitted = True
-
     return render(request, 'travelApp/planTrip.html', {
         'form': form,
         'available_trips': available_trips,
